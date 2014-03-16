@@ -43,6 +43,9 @@ module Capistrano
               local_manifest_path = run_locally "ls #{assets_dir}/manifest*"
               local_manifest_path.strip!
 
+              logger.info '*'*30
+              logger.info shared_manifest_path
+
               # Sync manifest filenames across servers if our manifest has a random filename
               if shared_manifest_path =~ /manifest-.+\./
                 run <<-CMD.compact
