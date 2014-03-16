@@ -43,6 +43,13 @@ module Capistrano
               local_manifest_path = run_locally "ls #{assets_dir}/manifest*"
               local_manifest_path.strip!
 
+              # Sync manifest filenames across servers if our manifest has a random filename
+              if shared_manifest_path =~ /manifest-.+\./
+                run <<-CMD.compact
+                  [ -e #{shared_manifest_path.shellescape} ] || mv -- #{shared_path.shellescape}/#{shared_assets_prefix}/manifest* #{shared_manifest_path.shellescape}
+                CMD
+              end
+
               servers = find_servers :roles => assets_role, :except => { :no_release => true }
               servers.each do |srvr|
                 run_locally "#{fetch(:rsync_cmd)} ./#{fetch(:assets_dir)}/ #{user}@#{srvr}:#{release_path}/#{fetch(:assets_dir)}/"
